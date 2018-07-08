@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="TransToBjsc:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/TransToBjsc_jar</output-path>
+    <root id="archive" name="TransToBjsc.jar">
+      <element id="module-output" name="TransToBjsc" />
+    </root>
+  </artifact>
+</component>
