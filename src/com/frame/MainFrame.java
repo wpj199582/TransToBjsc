@@ -1,5 +1,7 @@
 package com.frame;
 
+import com.io.FileUtil;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -26,13 +28,13 @@ public class MainFrame extends JFrame implements ActionListener {
         //初始化容器
         container=getContentPane();
         //初始化各组件
-        labela=new JLabel("选择输入目录");
-        labelb=new JLabel("选择输出目录");
+        labela=new JLabel("input");
+        labelb=new JLabel("output");
         textField1=new JTextField();
         textField2=new JTextField();
         jb1=new JButton("...");
         jb2=new JButton("...");
-        jb3=new JButton("开始转换");
+        jb3=new JButton("start");
         //一些基本设置(布局，大小。可视)
         double lx = Toolkit.getDefaultToolkit().getScreenSize().getWidth();
         double ly = Toolkit.getDefaultToolkit().getScreenSize().getHeight();
@@ -41,9 +43,9 @@ public class MainFrame extends JFrame implements ActionListener {
         labelb.setBounds(10, 35, 70, 20);
         textField1.setBounds(75, 10, 120, 20);
         textField2.setBounds(75, 35, 120, 20);
-        jb1.setBounds(210, 10, 50, 20);
-        jb2.setBounds(210, 35, 50, 20);
-        jb3.setBounds(30, 60, 60, 20);
+        jb1.setBounds(210, 10, 60, 20);
+        jb2.setBounds(210, 35, 60, 20);
+        jb3.setBounds(70, 80, 80, 20);
         //给按钮添加监听
         jb1.addActionListener(this);
         jb2.addActionListener(this);
@@ -58,7 +60,7 @@ public class MainFrame extends JFrame implements ActionListener {
         container.add(jb3);
        // this.add(container);
         this.setLayout(null);
-        this.setSize(280,200);
+        this.setSize(300,200);
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.setVisible(true);
     }
@@ -81,6 +83,8 @@ new MainFrame();
                  return;
              else{
                  inputDir=jfc.getSelectedFile();
+                 //使用文件处理工具
+                 FileUtil.FileHandler(inputDir);
                  textField1.setText(inputDir.getAbsolutePath());
              }
          }
@@ -95,5 +99,9 @@ new MainFrame();
                  textField2.setText(outputDir.getAbsolutePath());
              }
          }
+         else{
+
+         }
     }
+
 }
