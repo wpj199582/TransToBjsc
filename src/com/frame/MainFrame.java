@@ -105,10 +105,8 @@ new MainFrame();
        // System.out.println("shuru:"+inputDir.getName()+"----"+"shuchu"+outputDir.getName());
          if(e.getSource()==jb3){
             FileUtil.startTransTo();
-//             if(flag)
-                 JOptionPane.showMessageDialog(null,"转换成功！","title",JOptionPane.PLAIN_MESSAGE);//转换成功
-//             else
-//                 JOptionPane.showMessageDialog(null,"转换失败，好像出了点问题","title",JOptionPane.ERROR_MESSAGE);//转换失败
+            JOptionPane.showMessageDialog(null,"转换成功！","title",JOptionPane.PLAIN_MESSAGE);//转换成功
+
          }
     }
 

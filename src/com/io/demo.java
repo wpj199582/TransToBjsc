@@ -18,9 +18,10 @@ public class demo {
 //            }
 //
 //        }
-        String line="public enum BoolStatusEnum {";
-        String tmp=StringUtils.deleteWhitespace(line);
-        String namespace= tmp.substring(10,tmp.length());
-        System.out.println(namespace);
+        String line=" public class FareFeeDTO implements SpecificRecord {";
+        String tmp=StringUtils.trimToNull(line);
+
+        System.out.println(StringUtils.substringAfter(StringUtils.substringBefore(tmp,"implements"),"public"));
+
     }
 }

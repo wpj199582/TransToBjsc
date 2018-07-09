@@ -91,22 +91,50 @@ public class FileUtil {
             }
             //转换枚举定义
             else if(StringUtils.contains(line,"public enum")){
-                String tmp=StringUtils.deleteWhitespace(line);
-                String enumDef="enum "+tmp.substring(10,tmp.length());
+                String tmp=StringUtils.trimToNull(line);
+                String enumDef=tmp.substring(6,tmp.length());
                 newlist.add(enumDef);
             }
-            //添加枚举的值，java枚举类转换bjsc转换完毕
+            //添加枚举的值，要带上备注，java枚举类转换bjsc转换完毕
             else if(StringUtils.contains(line,"@XmlEnumValue")){
-                 newlist.add("    "+map.get(count+1));//当有@XmlEnumValue时，将下面一行加入
+                 newlist.add("    "+map.get(count-3));//当有@XmlEnumValue时，将上面的三行注释加入
+                 newlist.add("    "+map.get(count-2));//当有@XmlEnumValue时，将上面的三行注释加入
+                 newlist.add("    "+map.get(count-1));//当有@XmlEnumValue时，将上面的三行注释加入
+                 String tmp=map.get(count+1);
+                 if(!tmp.endsWith(";"))
+                     newlist.add("    "+StringUtils.substringBefore(tmp,"(")+",");//当有@XmlEnumValue时，将下面一行加入,
+                 else
+                     newlist.add("    "+StringUtils.substringBefore(tmp,"(")+";");//当有@XmlEnumValue时，将下面一行加入,
             }
-            //class类
+            //class类定义的头部
             else if(StringUtils.contains(line,"public class")){
+                String tmp=StringUtils.trimToNull(line);
+                newlist.add(StringUtils.substringAfter(StringUtils.substringBefore(tmp,"implements"),"public")+"{");
+            }
+            //成员变量
+            else if(StringUtils.contains(line,"@FieldDoc")){
+                String tmp=StringUtils.trimToNull(line);
+                newlist.add("//"+StringUtils.substringBefore(StringUtils.substringAfter(tmp,"("),")"));
+            }
+            else if(StringUtils.contains(line,"private")||StringUtils.contains(line,"public")||StringUtils.contains(line,"protected")){
+                String tmp=StringUtils.trimToNull(line);
+                String[] strings=tmp.split(" ");
 
+                if(strings.length==3){
+                    String member="   "+toLowerCase(strings[1])+" "+strings[2];
+                    newlist.add(member);
+                }
             }
             count++;
         }
 
         newlist.add("}");
         return newlist;
+    }
+    public static  String toLowerCase(String s){
+        if(Character.isLowerCase(s.charAt(0)))
+            return s;
+        else
+            return (new StringBuilder()).append(Character.toLowerCase(s.charAt(0))).append(s.substring(1)).toString();
     }
 }
