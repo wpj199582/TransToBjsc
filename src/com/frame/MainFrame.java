@@ -82,25 +82,32 @@ new MainFrame();
              if(status==1)//如果取消选择，返回
                  return;
              else{
-                 inputDir=jfc.getSelectedFile();
+                    inputDir=jfc.getSelectedFile();
+                    FileUtil.inputDir=inputDir;
                  //使用文件处理工具
-                 FileUtil.FileHandler(inputDir);
+                 //FileUtil.Fileshow(inputDir);
                  textField1.setText(inputDir.getAbsolutePath());
              }
          }
          //选择输出目录
-         else if(e.getSource()==jb2){
+         if(e.getSource()==jb2){
              jfc.setFileSelectionMode(1);//代表只能选择文件夹
              int status=jfc.showOpenDialog(null);
              if(status==1)//如果取消选择，返回
                  return;
              else {
                  outputDir = jfc.getSelectedFile();
+                 FileUtil.outputDir=outputDir;
                  textField2.setText(outputDir.getAbsolutePath());
              }
          }
-         else{
-
+       // System.out.println("shuru:"+inputDir.getName()+"----"+"shuchu"+outputDir.getName());
+         if(e.getSource()==jb3){
+            FileUtil.startTransTo();
+//             if(flag)
+                 JOptionPane.showMessageDialog(null,"转换成功！","title",JOptionPane.PLAIN_MESSAGE);//转换成功
+//             else
+//                 JOptionPane.showMessageDialog(null,"转换失败，好像出了点问题","title",JOptionPane.ERROR_MESSAGE);//转换失败
          }
     }
 
