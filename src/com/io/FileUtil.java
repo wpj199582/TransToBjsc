@@ -1,8 +1,12 @@
 package com.io;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class FileUtil {
     public  static  File inputDir;
@@ -49,10 +53,6 @@ public class FileUtil {
                               bufferedWriter.write(str);
                               bufferedWriter.newLine();
                           }
-//                          Iterator<String> iterator=fileLines.iterator();
-//                          while(iterator.hasNext()){
-//                              System.out.println(iterator.next());
-//                          }
                           //关闭io流
                           bufferedReader.close();
                           bufferedWriter.close();
@@ -68,10 +68,45 @@ public class FileUtil {
      */
     public static List<String> bjscFun(List<String> list){
         List<String> newlist=new ArrayList<>();
-         newlist.add("include 'BaijiCommonTypes.bjsc'");
+        //添加文件包含
+        newlist.add("include 'BaijiCommonTypes.bjsc'");
+        //添加命名空间namespace定义
+        Iterator<String> iterator=list.iterator();
+        Map<Integer,String> map=new HashMap<>();
+        int index=1;
+        //存入map，行号，行的内容
+        for(String str:list){
+            map.put(index,str);
+            index++;
+        }
+        int count=1;
+        while(iterator.hasNext()){
+            //拿到一整行字符串
+            String line=iterator.next();
+            //namespace
+            if(line.startsWith("package")){
+                String tmp=StringUtils.deleteWhitespace(line);
+                String namespace= "namespace java "+"'"+tmp.substring(7,tmp.length()-1)+"'";
+                newlist.add(namespace);
+            }
+            //转换枚举定义
+            else if(StringUtils.contains(line,"public enum")){
+                String tmp=StringUtils.deleteWhitespace(line);
+                String enumDef="enum "+tmp.substring(10,tmp.length());
+                newlist.add(enumDef);
+            }
+            //添加枚举的值，java枚举类转换bjsc转换完毕
+            else if(StringUtils.contains(line,"@XmlEnumValue")){
+                 newlist.add("    "+map.get(count+1));//当有@XmlEnumValue时，将下面一行加入
+            }
+            //class类
+            else if(StringUtils.contains(line,"public class")){
 
-         newlist.addAll(list);
+            }
+            count++;
+        }
 
+        newlist.add("}");
         return newlist;
     }
 }

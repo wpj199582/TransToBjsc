@@ -1,4 +1,6 @@
 package com.io;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.*;
 public class demo {
     public static void main(String[] args) {
@@ -16,9 +18,9 @@ public class demo {
 //            }
 //
 //        }
-        String line="12345678.java";
-        int n=5;
-        System.out.println(line.substring(0,line.length()-n));
-        System.out.println(line.substring(0,line.length()-n)+".bjsc");
+        String line="public enum BoolStatusEnum {";
+        String tmp=StringUtils.deleteWhitespace(line);
+        String namespace= tmp.substring(10,tmp.length());
+        System.out.println(namespace);
     }
 }

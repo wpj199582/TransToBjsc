@@ -43,8 +43,8 @@ public class MainFrame extends JFrame implements ActionListener {
         labelb.setBounds(10, 35, 70, 20);
         textField1.setBounds(75, 10, 120, 20);
         textField2.setBounds(75, 35, 120, 20);
-        jb1.setBounds(210, 10, 60, 20);
-        jb2.setBounds(210, 35, 60, 20);
+        jb1.setBounds(210, 10, 50, 20);
+        jb2.setBounds(210, 35, 50, 20);
         jb3.setBounds(70, 80, 80, 20);
         //给按钮添加监听
         jb1.addActionListener(this);
@@ -59,6 +59,7 @@ public class MainFrame extends JFrame implements ActionListener {
         container.add(jb2);
         container.add(jb3);
        // this.add(container);
+        this.setTitle("bjsc转换工具");
         this.setLayout(null);
         this.setSize(300,200);
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -91,7 +92,7 @@ new MainFrame();
          }
          //选择输出目录
          if(e.getSource()==jb2){
-             jfc.setFileSelectionMode(1);//代表只能选择文件夹
+             jfc.setFileSelectionMode(1);//代表只能选择文件夹，0代表只选择文件
              int status=jfc.showOpenDialog(null);
              if(status==1)//如果取消选择，返回
                  return;
