@@ -111,18 +111,22 @@ public class FileUtil {
                 String tmp=StringUtils.trimToNull(line);
                 newlist.add(StringUtils.substringAfter(StringUtils.substringBefore(tmp,"implements"),"public")+"{");
             }
-            //成员变量
-            else if(StringUtils.contains(line,"@FieldDoc")){
-                String tmp=StringUtils.trimToNull(line);
-                newlist.add("//"+StringUtils.substringBefore(StringUtils.substringAfter(tmp,"("),")"));
+
+            //类、成员变量的注释
+            else if(StringUtils.contains(line,"@FieldDoc")||StringUtils.contains(line,"@DtoDoc")){
+                newlist.add(findCommit(line));
             }
+            //成员变量
             else if(StringUtils.contains(line,"private")||StringUtils.contains(line,"public")||StringUtils.contains(line,"protected")){
                 String tmp=StringUtils.trimToNull(line);
                 String[] strings=tmp.split(" ");
-
+                //这里有很大问题，不能直接指定为3
                 if(strings.length==3){
                     String member="   "+toLowerCase(strings[1])+" "+strings[2];
                     newlist.add(member);
+                }
+                if(strings.length==7){
+
                 }
             }
             count++;
@@ -131,10 +135,26 @@ public class FileUtil {
         newlist.add("}");
         return newlist;
     }
-    public static  String toLowerCase(String s){
-        if(Character.isLowerCase(s.charAt(0)))
-            return s;
+
+    /**
+     *将字符串首字母转换成小写
+     * @param line
+     * @return
+     */
+    public static  String toLowerCase(String line){
+        if(Character.isLowerCase(line.charAt(0)))
+            return line;
         else
-            return (new StringBuilder()).append(Character.toLowerCase(s.charAt(0))).append(s.substring(1)).toString();
+            return (new StringBuilder()).append(Character.toLowerCase(line.charAt(0))).append(line.substring(1)).toString();
+    }
+
+    /**
+     * 将类以及其成员变量的注释取出
+     * @param line
+     * @return
+     */
+    public static  String findCommit(String line){
+        String tmp=StringUtils.trimToNull(line);
+        return "//"+StringUtils.substringBefore(StringUtils.substringAfter(tmp,"("),")");
     }
 }
