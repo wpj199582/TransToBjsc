@@ -108,10 +108,9 @@ public class FileUtil {
                      newlist.add("    "+map.get(count-2));//当有@XmlEnumValue时，将上面的三行注释加入
                      newlist.add("    "+map.get(count-1));//当有@XmlEnumValue时，将上面的三行注释加入
                  }
-
                  String tmp=map.get(count+1);
                  if(!tmp.endsWith(";"))
-                     newlist.add("    "+StringUtils.substringBefore(tmp,"(")+",");//当有@XmlEnumValue时，将下面一行加入,
+                     newlist.add("    "+StringUtils.substringBefore(tmp,"(")+";");//当有@XmlEnumValue时，将下面一行加入,
                  else
                      newlist.add("    "+StringUtils.substringBefore(tmp,"("));//当有@XmlEnumValue时，将下面一行加入,
                  newlist.add("\n");
@@ -128,50 +127,11 @@ public class FileUtil {
                 newlist.add(getCommit(line));
                 newlist.add("  */");
             }
-            //成员变量
+            //成员变量以及需要引入的文件
             else if(StringUtils.contains(line,"private")||StringUtils.contains(line,"public")||StringUtils.contains(line,"protected")){
-                String tmp=StringUtils.trimToNull(line);
-                String[] strings=tmp.split(" ");
-                //这里有很大问题，不能直接指定为3
-                if(strings.length==3&&!"public".equals(strings[0])){
-                    //如果strings[1]是简单类型则需要转换成小写
-                    if(BasicType.isBasicType(strings[1])){
-                        strings[1]=toLowerCase(strings[1]);//如果是基本类型，转成小写
-                        if("boolean".equals(strings[1]))
-                            strings[1]="bool";//IDL内置的bool类型为 “bool”
-                        else if("calendar".equals(strings[1]))
-                            strings[1]="datetime";//IDL对应calendar的为datetime
-                        else if("byte[]".equals(strings[1]))
-                            strings[1]="binary";//IDL对应byte[]的是binary
-                    }
-                    //list和map中可能存放了其它idl文件定义的数据类型
-                    else if(strings[1].startsWith("List")||strings[1].startsWith("Map")){
-                        strings[1]=toLowerCaseFirstCh(strings[1]);//list或者map首字母小写
-                        String type=StringUtils.substringBefore(StringUtils.substringAfter(strings[1],"<"),">");
-                        //当集合中不是基本类型时，需要引入idl文件
-                        if(!BasicType.isBasicType(type)){
-                            String include="include '"+type+".bjsc'";
-                            //需要避免重复
-                            newlist= removeDou(newlist,include);
-                            newlist.addFirst(include);
-                        }else{
-                            strings[1]=toLowerCase(strings[1]);
-                        }
-
-                    }
-                    //如果strings[1]是其他idl文件中定义的数据类型,就include相应的bjsc文件
-                    else{
-                        String include="include '"+strings[1]+".bjsc'";
-                        //需要避免重复
-                        newlist= removeDou(newlist,include);
-                        newlist.addFirst(include);
-                    }
-                    //存入list
-                    newlist.add("    "+strings[1]+" "+strings[2]);
-                    newlist.add("\n");
-                }
-
+                includeField(line,newlist);
             }
+
             count++;
         }
 
@@ -179,6 +139,59 @@ public class FileUtil {
         return newlist;
     }
 
+    /**
+     * 添加成员变量，以及需要include的文件
+     * @param line
+     * @param newlist
+     */
+     public static void includeField(String line,LinkedList<String> newlist){
+         String tmp=StringUtils.trimToNull(line);
+         String[] strings=tmp.split(" ");
+         if(strings.length==3&&!"public".equals(strings[0])){
+             //如果strings[1]是简单类型则需要转换成小写
+             String zhu=strings[1];
+             if(BasicType.isBasicType(strings[1])){
+                 strings[1]=toLowerCase(strings[1]);//如果是基本类型，转成小写
+                 if("boolean".equals(strings[1]))
+                     strings[1]="bool";//IDL内置的bool类型为 “bool”
+                 else if("calendar".equals(strings[1]))
+                     strings[1]="datetime";//IDL对应calendar的为datetime
+                 else if("byte[]".equals(strings[1]))
+                     strings[1]="binary";//IDL对应byte[]的是binary
+                 else if("bigdecimal".equals(strings[1]))
+                     strings[1]="decimal";
+             }
+             //list和map中可能存放了其它idl文件定义的数据类型
+             else if(strings[1].startsWith("List")){
+                 strings[1]=toLowerCaseFirstCh(strings[1]);//list或者map首字母小写
+                 String type=StringUtils.substringBefore(StringUtils.substringAfter(strings[1],"<"),">");
+                 //当集合中不是基本类型时，需要引入idl文件
+                 if(!BasicType.isBasicType(type)){
+                     String include="include '"+type+".bjsc'";
+                     //需要避免重复
+                     newlist= removeDou(newlist,include);
+                     newlist.addFirst(include);
+                     String newtype=type+"."+type;
+                     strings[1]=StringUtils.substringBefore(strings[1],"<")+"<"+newtype+">";
+                 }else{
+                     //基本类型所有字符都是小写
+                     strings[1]=toLowerCase(strings[1]);
+                 }
+
+             }
+             //如果strings[1]是其他idl文件中定义的数据类型,就include相应的bjsc文件
+             else{
+                 String include="include '"+strings[1]+".bjsc'";
+                 //需要避免重复
+                 newlist= removeDou(newlist,include);
+                 newlist.addFirst(include);
+                 strings[1]=zhu+"."+strings[1];
+             }
+             //存入list
+             newlist.add("    "+strings[1]+" "+strings[2]);
+             newlist.add("\n");
+         }
+     }
     /**
      * 去除 LinkedList中重复元素
      * @param list

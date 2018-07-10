@@ -20,8 +20,8 @@ public enum BasicType {
        FLOATHIGH("Float"),
        DUOBLELOW("double"),
        DUOBLEHIGH("Double"),
-       CALENDAR("Calendar"),
-       BIGDECIMAL("BigDecimal");
+       BIGDECIMAL("BigDecimal"),
+       CALENDAR("Calendar");
 
        private final String value;
 
