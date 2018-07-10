@@ -134,23 +134,36 @@ public class FileUtil {
                 String[] strings=tmp.split(" ");
                 //这里有很大问题，不能直接指定为3
                 if(strings.length==3&&!"public".equals(strings[0])){
-                    //需要加一个判断，如果是简单类型则需要转换成小写
+                    //如果strings[1]是简单类型则需要转换成小写
                     if(BasicType.isBasicType(strings[1])){
                         strings[1]=toLowerCase(strings[1]);//如果是基本类型，转成小写
                         if("boolean".equals(strings[1]))
                             strings[1]="bool";//IDL内置的bool类型为 “bool”
                         else if("calendar".equals(strings[1]))
                             strings[1]="datetime";//IDL对应calendar的为datetime
+                        else if("byte[]".equals(strings[1]))
+                            strings[1]="binary";//IDL对应byte[]的是binary
                     }
                     //list和map中可能存放了其它idl文件定义的数据类型
                     else if(strings[1].startsWith("List")||strings[1].startsWith("Map")){
-                        strings[1]=toLowerCaseFirstCh(strings[1]);//首字母小写
-                        String include="include '"+StringUtils.substringBefore(StringUtils.substringAfter(strings[1],"<"),">")+".bjsc'";
-                        newlist.addFirst(include);
+                        strings[1]=toLowerCaseFirstCh(strings[1]);//list或者map首字母小写
+                        String type=StringUtils.substringBefore(StringUtils.substringAfter(strings[1],"<"),">");
+                        //当集合中不是基本类型时，需要引入idl文件
+                        if(!BasicType.isBasicType(type)){
+                            String include="include '"+type+".bjsc'";
+                            //需要避免重复
+                            newlist= removeDou(newlist,include);
+                            newlist.addFirst(include);
+                        }else{
+                            strings[1]=toLowerCase(strings[1]);
+                        }
+
                     }
-                    //如果是其他idl文件中定义的数据类型,就include相应的bjsc文件
+                    //如果strings[1]是其他idl文件中定义的数据类型,就include相应的bjsc文件
                     else{
                         String include="include '"+strings[1]+".bjsc'";
+                        //需要避免重复
+                        newlist= removeDou(newlist,include);
                         newlist.addFirst(include);
                     }
                     //存入list
@@ -166,6 +179,21 @@ public class FileUtil {
         return newlist;
     }
 
+    /**
+     * 去除 LinkedList中重复元素
+     * @param list
+     * @param line
+     * @return
+     */
+     public static LinkedList<String> removeDou(LinkedList<String> list,String line){
+         List<String> tmplist=new LinkedList<>();
+         for(String str:list){
+             if(line.equals(str))
+                 tmplist.add(str);
+         }
+         list.removeAll(tmplist);
+         return list;
+     }
     /**
      *将字符串全部转换成小写
      * @param line

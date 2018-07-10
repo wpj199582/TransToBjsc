@@ -7,37 +7,34 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class demo {
-    public static boolean isEnumValueCommit(String s1,String s2,String s3){
-        boolean result=false;
-        s1=StringUtils.trimToNull(s1);
-        s2=StringUtils.trimToNull(s2);
-        s3=StringUtils.trimToNull(s3);
-        result=s1.startsWith("/**")&&s2.startsWith("*")&&s3.startsWith("*/");
-        return result;
-    }
+
     public static void main(String[] args) {
 
 //        String line="  public TripDTO() {";
 //        String tmp=StringUtils.trimToNull(line);
 //        System.out.println(tmp.split(" ").length);
 //        //System.out.println(StringUtils.substringAfter(StringUtils.substringBefore(tmp,"implements"),"public"));
-//        LinkedList<String> list=new LinkedList<>();
-//        list.add("a");
-//        list.add("b");
-//        list.add("c");
-//        list.add("d");
-//        System.out.println(list.toString());
-//        list.addFirst("nihaoya");
-//        System.out.println("\n");
-//        System.out.println(list.toString());
-        String s1=" /**";
-        String s2="  * 国内系统机票订单";
-        String s3="  *";
-        String aa="abcdEFGD";
-        System.out.println(aa.toLowerCase());
-        System.out.println(isEnumValueCommit(s1,s2,s3));
-        String test="list<PolicyUnitFcaInfoDTO>";
-        System.out.println(StringUtils.substringBefore(StringUtils.substringAfter(test,"<"),">"));
+        LinkedList<String> list=new LinkedList<>();
+        list.add("a");
+        list.add("a");
+        list.add("a");
+        list.add("b");
+        list.add("c");
+        list.add("d");
+        System.out.println(list.toString());
+        list.addFirst("nihaoya");
+        System.out.println("\n");
+        System.out.println(list.toString());
+
+        System.out.println();
+//        String s1=" /**";
+//        String s2="  * 国内系统机票订单";
+//        String s3="  *";
+//        String aa="abcdEFGD";
+//        System.out.println(aa.toLowerCase());
+//        //System.out.println(isEnumValueCommit(s1,s2,s3));
+//        String test="list<PolicyUnitFcaInfoDTO>";
+//        System.out.println(StringUtils.substringBefore(StringUtils.substringAfter(test,"<"),">"));
 
 }
 }

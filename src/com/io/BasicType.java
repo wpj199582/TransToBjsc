@@ -8,6 +8,7 @@ public enum BasicType {
        INITHIGH("Integer"),
        BYTELOW("byte"),
        BYTEHIGH("Byte"),
+       BYTEARRAY("byte[]"),
        SHORTLOW("short"),
        SHORTHIGH("Short"),
        LONGLOW("long"),
