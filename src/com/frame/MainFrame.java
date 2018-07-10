@@ -85,8 +85,6 @@ new MainFrame();
              else{
                     inputDir=jfc.getSelectedFile();
                     FileUtil.inputDir=inputDir;
-                 //使用文件处理工具
-                 //FileUtil.Fileshow(inputDir);
                  textField1.setText(inputDir.getAbsolutePath());
              }
          }
@@ -102,9 +100,8 @@ new MainFrame();
                  textField2.setText(outputDir.getAbsolutePath());
              }
          }
-       // System.out.println("shuru:"+inputDir.getName()+"----"+"shuchu"+outputDir.getName());
          if(e.getSource()==jb3){
-            FileUtil.startTransTo();
+            FileUtil.startTransTo(FileUtil.inputDir,FileUtil.outputDir);
             JOptionPane.showMessageDialog(null,"转换成功！","title",JOptionPane.PLAIN_MESSAGE);//转换成功
 
          }
