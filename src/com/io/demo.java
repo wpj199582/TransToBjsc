@@ -18,10 +18,11 @@ public class demo {
 //            }
 //
 //        }
-        String line=" public class FareFeeDTO implements SpecificRecord {";
+        String line="  public TripDTO() {";
         String tmp=StringUtils.trimToNull(line);
+        System.out.println(tmp.split(" ").length);
+        //System.out.println(StringUtils.substringAfter(StringUtils.substringBefore(tmp,"implements"),"public"));
 
-        System.out.println(StringUtils.substringAfter(StringUtils.substringBefore(tmp,"implements"),"public"));
 
     }
 }

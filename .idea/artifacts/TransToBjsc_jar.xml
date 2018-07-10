@@ -3,6 +3,7 @@
     <output-path>$PROJECT_DIR$/out/artifacts/TransToBjsc_jar</output-path>
     <root id="archive" name="TransToBjsc.jar">
       <element id="module-output" name="TransToBjsc" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/src/lib/commons-lang3-3.2.1.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

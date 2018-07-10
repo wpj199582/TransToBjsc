@@ -40,7 +40,7 @@ public class FileUtil {
                       if(subfile.isFile()&&subfile.getName().endsWith(".java")){
                           BufferedReader   bufferedReader = new BufferedReader(new FileReader(subfile));
                           String newName=subfile.getName().substring(0,subfile.getName().length()-5)+".bjsc";//这里输出文件的后缀要改为bjsc
-                          BufferedWriter  bufferedWriter=new BufferedWriter(new FileWriter(new File(outputDir,newName)));//输出流
+                          BufferedWriter  bufferedWriter=new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(outputDir,newName)),"UTF-8"));//输出流
                           List<String> fileLines=new ArrayList<>();//存储文件中数据
                           String  line;
                           while((line=bufferedReader.readLine())!=null){
@@ -89,6 +89,13 @@ public class FileUtil {
                 String namespace= "namespace java "+"'"+tmp.substring(7,tmp.length()-1)+"'";
                 newlist.add(namespace);
             }
+            //枚举类的注释
+            else if(StringUtils.contains(line,"@XmlType")){
+                newlist.add("    "+map.get(count-3));//当有@XmlType时，将上面的三行注释加入
+                newlist.add("    "+map.get(count-2));//当有@XmlType时，将上面的三行注释加入
+                newlist.add("    "+map.get(count-1));//当有@XmlType时，将上面的三行注释加入
+                newlist.add("             ");
+            }
             //转换枚举定义
             else if(StringUtils.contains(line,"public enum")){
                 String tmp=StringUtils.trimToNull(line);
@@ -100,11 +107,13 @@ public class FileUtil {
                  newlist.add("    "+map.get(count-3));//当有@XmlEnumValue时，将上面的三行注释加入
                  newlist.add("    "+map.get(count-2));//当有@XmlEnumValue时，将上面的三行注释加入
                  newlist.add("    "+map.get(count-1));//当有@XmlEnumValue时，将上面的三行注释加入
+                 //newlist.add("             ");
                  String tmp=map.get(count+1);
                  if(!tmp.endsWith(";"))
                      newlist.add("    "+StringUtils.substringBefore(tmp,"(")+",");//当有@XmlEnumValue时，将下面一行加入,
                  else
-                     newlist.add("    "+StringUtils.substringBefore(tmp,"(")+";");//当有@XmlEnumValue时，将下面一行加入,
+                     newlist.add("    "+StringUtils.substringBefore(tmp,"("));//当有@XmlEnumValue时，将下面一行加入,
+                 newlist.add("             ");
             }
             //class类定义的头部
             else if(StringUtils.contains(line,"public class")){
@@ -114,20 +123,26 @@ public class FileUtil {
 
             //类、成员变量的注释
             else if(StringUtils.contains(line,"@FieldDoc")||StringUtils.contains(line,"@DtoDoc")){
-                newlist.add(findCommit(line));
+                newlist.add(" /**");
+                newlist.add(getCommit(line));
+                newlist.add("  */");
+                //newlist.add("             ");
             }
             //成员变量
             else if(StringUtils.contains(line,"private")||StringUtils.contains(line,"public")||StringUtils.contains(line,"protected")){
                 String tmp=StringUtils.trimToNull(line);
                 String[] strings=tmp.split(" ");
                 //这里有很大问题，不能直接指定为3
-                if(strings.length==3){
+                if(strings.length==3&&!"public".equals(strings[0])){
                     String member="   "+toLowerCase(strings[1])+" "+strings[2];
                     newlist.add(member);
+                    newlist.add("             ");
                 }
-                if(strings.length==7){
+                String add="";
+//                if(strings.length==7){
+//
+//                }
 
-                }
             }
             count++;
         }
@@ -153,8 +168,9 @@ public class FileUtil {
      * @param line
      * @return
      */
-    public static  String findCommit(String line){
+    public static  String getCommit(String line){
         String tmp=StringUtils.trimToNull(line);
-        return "//"+StringUtils.substringBefore(StringUtils.substringAfter(tmp,"("),")");
+        tmp=tmp.replace("\"","");
+        return "  *"+StringUtils.substringBefore(StringUtils.substringAfter(tmp,"("),")");
     }
 }
