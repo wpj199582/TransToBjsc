@@ -118,7 +118,10 @@ public class FileUtil {
             //class类定义的头部
             else if(StringUtils.contains(line,"public class")){
                 String tmp=StringUtils.trimToNull(line);
-                newlist.add(StringUtils.substringAfter(StringUtils.substringBefore(tmp,"implements"),"public")+"{");
+                if(!StringUtils.contains(line,"extends"))
+                    newlist.add(StringUtils.substringAfter(StringUtils.substringBefore(tmp,"implements"),"public")+"{");
+                else
+                    newlist.add(StringUtils.substringAfter(StringUtils.substringBefore(tmp,"extends"),"public")+"{");
             }
 
             //类、成员变量的注释
@@ -152,46 +155,92 @@ public class FileUtil {
              String zhu=strings[1];
              if(BasicType.isBasicType(strings[1])){
                  strings[1]=toLowerCase(strings[1]);//如果是基本类型，转成小写
-                 if("boolean".equals(strings[1]))
-                     strings[1]="bool";//IDL内置的bool类型为 “bool”
-                 else if("calendar".equals(strings[1]))
-                     strings[1]="datetime";//IDL对应calendar的为datetime
-                 else if("byte[]".equals(strings[1]))
-                     strings[1]="binary";//IDL对应byte[]的是binary
-                 else if("bigdecimal".equals(strings[1]))
-                     strings[1]="decimal";
+                 strings[1]=mapType(strings[1]);
              }
              //list和map中可能存放了其它idl文件定义的数据类型
              else if(strings[1].startsWith("List")){
-                 strings[1]=toLowerCaseFirstCh(strings[1]);//list或者map首字母小写
+                 strings[1]=toLowerCaseFirstCh(strings[1]);//list首字母小写
                  String type=StringUtils.substringBefore(StringUtils.substringAfter(strings[1],"<"),">");
                  //当集合中不是基本类型时，需要引入idl文件
                  if(!BasicType.isBasicType(type)){
-                     String include="include '"+type+".bjsc'";
-                     //需要避免重复
-                     newlist= removeDou(newlist,include);
-                     newlist.addFirst(include);
-                     String newtype=type+"."+type;
-                     strings[1]=StringUtils.substringBefore(strings[1],"<")+"<"+newtype+">";
+                     if(!"ResponseStatusType".equals(type)){
+                         String include="include '"+type+".bjsc'";
+                         //需要避免重复
+                         newlist= removeDou(newlist,include);
+                         newlist.addFirst(include);
+                         String newtype=type+"."+type;
+                         strings[1]=StringUtils.substringBefore(strings[1],"<")+"<"+newtype+">";
+                     }
+                     else{
+                         String newtype="BaijiCommonTypes"+"."+type;
+                         strings[1]=StringUtils.substringBefore(strings[1],"<")+"<"+newtype+">";
+                     }
                  }else{
                      //基本类型所有字符都是小写
-                     strings[1]=toLowerCase(strings[1]);
+                     String newtype=toLowerCase(type);
+                     newtype=mapType(newtype);
+                     strings[1]=StringUtils.substringBefore(strings[1],"<")+"<"+newtype+">";
                  }
 
              }
+//             //是map类型时  private Map<String,TYPE> aa
+//             else if(strings[1].startsWith("Map")){
+//                 strings[1]=toLowerCaseFirstCh(strings[1]);//map首字母小写
+//                String type=StringUtils.substringBefore(StringUtils.substringAfter(strings[1],","),">");
+//                 if(!BasicType.isBasicType(type)){
+//                     if(!"ResponseStatusType".equals(type)){
+//                         String include="include '"+type+".bjsc'";
+//                         //需要避免重复
+//                         newlist= removeDou(newlist,include);
+//                         newlist.addFirst(include);
+//                         String newtype=type+"."+type;
+//                         strings[1]=StringUtils.substringBefore(strings[1],"<")+"<string,"+newtype+">";
+//                     }
+//                     else{
+//                         String newtype="BaijiCommonTypes"+"."+type;
+//                         strings[1]=StringUtils.substringBefore(strings[1],"<")+"<string,"+newtype+">";
+//                     }
+//
+//                 }else{
+//                     //基本类型所有字符都是小写
+//                     String newtype=toLowerCase(type);
+//                     newtype=mapType(newtype);
+//                     strings[1]=StringUtils.substringBefore(strings[1],"<")+"<string,"+newtype+">";
+//                 }
+//             }
              //如果strings[1]是其他idl文件中定义的数据类型,就include相应的bjsc文件
              else{
-                 String include="include '"+strings[1]+".bjsc'";
-                 //需要避免重复
-                 newlist= removeDou(newlist,include);
-                 newlist.addFirst(include);
-                 strings[1]=zhu+"."+strings[1];
+                 if(!"ResponseStatusType".equals(strings[1])){
+                     String include="include '"+strings[1]+".bjsc'";
+                     //需要避免重复
+                     newlist= removeDou(newlist,include);
+                     newlist.addFirst(include);
+                     strings[1]=zhu+"."+strings[1];
+                 }
+                 else{
+                     strings[1]="BaijiCommonTypes."+strings[1];
+                 }
+
              }
              //存入list
              newlist.add("    "+strings[1]+" "+strings[2]);
              newlist.add("\n");
          }
      }
+     public static  String mapType(String str){
+         if("boolean".equals(str))
+             str="bool";//IDL内置的bool类型为 “bool”
+         else if("calendar".equals(str))
+             str="datetime";//IDL对应calendar的为datetime
+         else if("byte[]".equals(str))
+             str="binary";//IDL对应byte[]的是binary
+         else if("bigdecimal".equals(str))
+             str="decimal";
+         else if("integer".equals(str))
+             str="int";
+         return str;
+     }
+
     /**
      * 去除 LinkedList中重复元素
      * @param list
